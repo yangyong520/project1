@@ -1,37 +1,26 @@
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "mosquitto.h"
-
-
-#define HOST "23.224.131.118"
-#define PORT 1883
-#define KEEP_ALIVE 60
-#define MSG_MAX_SIZE 512
-
-
-int writfile(char *temp) ;
-
-typedef struct data {
-    char time[12][6];
-} data;
-static int running = 1;
+#include "sub.h"
 
 void my_connect_callback(struct mosquitto *mosq,void *obj,int rc)
 {
-    printf("Call the function:on_connect\n");
+    sprintf(info,"Call the function:on_connect.");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
 
     if(rc)
     {
-        printf("on_connect error!\n");
+        sprintf(error,"on_connect error!");
+	output_to_console(LOG_LEVEL_ERROR, error);
+        output_to_file(filename, LOG_LEVEL_ERROR, error);
         exit(1);
     }
     else
     {
         if(mosquitto_subscribe(mosq,NULL,"test",2))
         {
-            printf("Set the topic error!\n");
+            sprintf(error,"Set the topic error!");
+	    output_to_console(LOG_LEVEL_ERROR, error);
+            output_to_file(filename, LOG_LEVEL_ERROR, error);
+
             exit(1);
         }
         
@@ -41,21 +30,33 @@ void my_connect_callback(struct mosquitto *mosq,void *obj,int rc)
 
 void my_disconnect_callback(struct mosquitto *mosq,void *obj,int rc)
 {
-    printf("Call the function: my_disconnect_callback\n");
+    sprintf(info,"Call the function: my_disconnect_callback");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
     running = 0;
 }
 
 void my_subscribe_callback(struct mosquitto *mosq,void *obj,int mid,int qos_count,const int *granted_qos)
 {
-    printf("Call the function: on_subscribe\n");
+    sprintf(info,"Call the function: on_subscribe");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
 }
 
 void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg)
 {
     writfile((char *)msg->payload);
 
-    printf("Call the function: on_message\n");
-    printf("Recieve a message of %s: %s\n.",(char *)msg->topic,(char *)msg->payload);
+    sprintf(info,"Call the function: on_message");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
+    sprintf(info,"Recieve a message of %s: %s.",(char *)msg->topic,(char *)msg->payload);
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
     if(0 == strcmp(msg->payload,"quit")){
     
         mosquitto_disconnect(mosq);
@@ -92,7 +93,9 @@ int main (int argc, char **argv)
     mosq = mosquitto_new("sub_test",true,NULL);
     if(mosq == NULL)
     {
-        printf("New sub_test error!\n");
+        sprintf(error,"New sub_test error!");
+	output_to_console(LOG_LEVEL_ERROR, error);
+        output_to_file(filename, LOG_LEVEL_ERROR, error);
         mosquitto_lib_cleanup();
         return -1;
     }
@@ -107,13 +110,18 @@ int main (int argc, char **argv)
 
     if(ret)
     {
-        printf("Connect server error!\n");
+        sprintf(info,"Connect server error!");
+	output_to_console(LOG_LEVEL_INFO, info);
+        output_to_file(filename, LOG_LEVEL_INFO, info);
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
         return -1;
     }
 
-    printf("Start!\n");
+    sprintf(info,"Start!");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
 
     while(running)
     {
@@ -125,7 +133,10 @@ int main (int argc, char **argv)
     mosquitto_lib_cleanup();
 
 
-    printf("End!\n");
+    sprintf(info,"End!");
+    output_to_console(LOG_LEVEL_INFO, info);
+    output_to_file(filename, LOG_LEVEL_INFO, info);
+
 
     return 0;
 } 
