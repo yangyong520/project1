@@ -12,9 +12,22 @@
 #define KEEP_ALIVE 60
 #define MSG_MAX_SIZE 512
 
+#ifdef DEBUG
+#define dbg_print(format,args...) printf(format,##args)
+#else
+#define dbg_print(format,args...) do{} while(0)
+#endif
 
 int writfile(char *temp) ;
-char *get_data_path(char *data_path,int s);
+config_t *get_config(); 
+void my_connect_callback(struct mosquitto *mosq,void *obj,int rc);
+void my_disconnect_callback(struct mosquitto *mosq,void *obj,int rc);
+void my_subscribe_callback(struct mosquitto *mosq,void *obj,int mid,int qos_count,const int *granted_qos);
+
+void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg);
+
+static config_t *global_config_ptr = NULL;
+
 
 char    error[128];
 char    info[128];
