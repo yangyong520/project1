@@ -26,7 +26,7 @@ int main (int argc, char **argv)
     mosquitto_subscribe_callback_set(mosq,my_subscribe_callback);
     mosquitto_message_callback_set(mosq,my_message_callback);
 
-    ret = mosquitto_connect(mosq,HOST,PORT,KEEP_ALIVE);
+    ret = mosquitto_connect(mosq,global_config_ptr->ip,global_config_ptr->port,KEEP_ALIVE);
 
     if(ret)
     {

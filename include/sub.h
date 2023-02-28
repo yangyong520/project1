@@ -7,8 +7,6 @@
 #include "mosquitto.h"
 #include "logger.h"
 
-#define HOST "23.224.131.118"
-#define PORT 1883
 #define KEEP_ALIVE 60
 #define MSG_MAX_SIZE 512
 
