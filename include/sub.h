@@ -12,6 +12,10 @@
 #define KEEP_ALIVE 60
 #define MSG_MAX_SIZE 512
 
+
+int writfile(char *temp) ;
+char *get_data_path(char *data_path,int s);
+
 char    error[128];
 char    info[128];
 char    warn[128];
@@ -19,7 +23,7 @@ char    debug[128];
 
 
 const char *filename = "sub.log";
-int writfile(char *temp) ;
+const char *dataname = "data.txt";
 
 typedef struct data {
     char time[12][6];

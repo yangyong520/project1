@@ -14,10 +14,10 @@ OBJS = $(SRCS:../src/%.c=$(OBJ)/%.o)
 
 all: pub sub
 
-pub: $(OBJ)/pub.o $(OBJ)/logger.o
+pub: $(OBJ)/pub.o $(OBJ)/logger.o $(OBJ)/ini.o $(OBJ)/config.o
 	$(CC) $^ -o $(BIN)/$@ $(LIBS)
 
-sub: $(OBJ)/sub.o $(OBJ)/logger.o
+sub: $(OBJ)/sub.o $(OBJ)/logger.o $(OBJ)/ini.o $(OBJ)/config.o
 	$(CC) $^ -o $(BIN)/$@ $(LIBS)
 
 # 根据源文件编译目标文件
