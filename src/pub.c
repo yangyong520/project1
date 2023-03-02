@@ -2,11 +2,26 @@
 
 static int running = 1;
 
-char    error[128];
-char    info[128];
-char    warn[128];
-char    debug[128];
+char    *dataname= "data.txt";
+char    error[356];
+char    info[356];
+char    warn[356];
+char    debug[356];
 
+int main (int argc, char **argv)
+{
+ pthread_t tid1, tid2;
+
+    // 创建线程，分别执行删除日志文件和其他任务
+    pthread_create(&tid1, NULL, delete_log_file, NULL);
+    pthread_create(&tid2, NULL, pub, NULL);
+
+    // 等待线程结束
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+
+    return 0;
+}
 
 void my_connect_callback(struct mosquitto *mosq,void *obj,int rc)
 {
@@ -110,12 +125,16 @@ int get_temperature(char *tempbuf)
 }
 
 
-int main (int argc, char **argv)
+void *pub(void *arg)
 {
 
     int rv;
     struct mosquitto *mosq;
     char buff[MSG_MAX_SIZE];
+
+    get_config();
+    strcat(config.log_path,"pub.log");
+
 
     mosquitto_lib_init();
 
@@ -127,14 +146,14 @@ int main (int argc, char **argv)
         output_to_file(filename, LOG_LEVEL_ERROR,error );
 
         mosquitto_lib_cleanup();
-        return -1;
+        return NULL;
     }
 
     mosquitto_connect_callback_set(mosq,my_connect_callback);
     mosquitto_disconnect_callback_set(mosq,my_disconnect_callback);
     mosquitto_publish_callback_set(mosq,my_publish_callback);
 
-    rv = mosquitto_connect(mosq,HOST,PORT,KEEP_ALIVE);
+    rv = mosquitto_connect(mosq,config.ip,config.port,KEEP_ALIVE);
 
     if(rv)
     {
@@ -144,7 +163,7 @@ int main (int argc, char **argv)
 
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
-        return -1;
+        return NULL;
     }
 
     sprintf(info,"Start!");
@@ -159,7 +178,7 @@ int main (int argc, char **argv)
         output_to_console(LOG_LEVEL_ERROR, error);
         output_to_file(filename, LOG_LEVEL_ERROR,error );
 
-        return 1;
+        return NULL;
     }
     while (1)
     {
@@ -170,7 +189,7 @@ int main (int argc, char **argv)
         	output_to_console(LOG_LEVEL_ERROR, error);
         	output_to_file(filename, LOG_LEVEL_ERROR,error );
 
-		return -1;
+		return NULL;
     	}
 
     	mosquitto_publish(mosq,NULL,"test",strlen(buff)+1,buff,0,0);
@@ -185,7 +204,7 @@ int main (int argc, char **argv)
     output_to_file(filename, LOG_LEVEL_INFO,info );
 
 
-    return 0;
+    return NULL;
 } 
 
 

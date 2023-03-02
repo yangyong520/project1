@@ -3,12 +3,26 @@
 static int running = 1;
 
 char    *dataname= "data.txt";
-char    error[128];
-char    info[128];
-char    warn[128];
-char    debug[128];
+char    error[356];
+char    info[356];
+char    warn[356];
+char    debug[356];
 
 int main (int argc, char **argv)
+{
+ pthread_t tid1, tid2;
+
+    // 创建线程，分别执行删除日志文件和其他任务
+    pthread_create(&tid1, NULL, delete_log_file, NULL);
+    pthread_create(&tid2, NULL, sub, NULL);
+
+    // 等待线程结束
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+
+    return 0;
+}
+void *sub(void *arg)
 {
     int ret;
     struct mosquitto *mosq;
@@ -25,7 +39,7 @@ int main (int argc, char **argv)
         output_to_console(LOG_LEVEL_ERROR, error);
         output_to_file(filename, LOG_LEVEL_ERROR, error);
         mosquitto_lib_cleanup();
-        return -1;
+        return NULL;
     }
 
 
@@ -43,7 +57,7 @@ int main (int argc, char **argv)
         output_to_file(filename, LOG_LEVEL_INFO, info);
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
-        return -1;
+        return NULL;
     }
 
     sprintf(info,"Start!");
@@ -66,7 +80,7 @@ int main (int argc, char **argv)
     output_to_file(filename, LOG_LEVEL_INFO, info);
 
 
-    return 0;
+    return NULL;
 } 
 void my_connect_callback(struct mosquitto *mosq,void *obj,int rc)
 {
@@ -150,10 +164,23 @@ int writfile(char *temp) {
 	 strcat(datapath,dataname);
 	 
 	 creat_file(datapath);
-	 printf("datapath:%s\n",datapath);
-        fp=fopen(datapath,"a");
-        fprintf(fp,"%s %s %s %s %s %s %s %s %s %s %s %s\n", dt.time[0], dt.time[1], dt.time[2], dt.time[3], dt.time[4], dt.time[5], dt.time[6], dt.time[7], dt.time[8], dt.time[9], dt.time[10], dt.time[11]);
-    fclose(fp);
+	 sprintf(debug,"datapath:%s\n",datapath);
+	 output_to_console(LOG_LEVEL_DEBUG, debug);
+         output_to_file(filename, LOG_LEVEL_DEBUG, debug);
+
+	 fp = fopen(datapath, "a");
+         if (fp == NULL) {
+             sprintf(error,"Failed to open file: %s\n", datapath);
+	     output_to_console(LOG_LEVEL_ERROR, error);
+             output_to_file(filename, LOG_LEVEL_ERROR, error);
+
+         } else {
+
+            fprintf(fp,"%s %s %s %s %s %s %s %s %s %s %s %s\n", dt.time[0], dt.time[1], dt.time[2], dt.time[3], dt.time[4], dt.time[5], dt.time[6], dt.time[7], dt.time[8], dt.time[9], dt.time[10], dt.time[11]);
+           fclose(fp);
+
+       }
+
     }
     
     return 0;

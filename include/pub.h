@@ -12,11 +12,25 @@
 #include <fcntl.h>
 #include "logger.h"
 #include "config.h"
+#include <pthread.h>
 
 
-#define HOST "23.224.131.118"
-#define PORT 1883
+#ifdef DEBUG
+#define dbg_print(format,args...) printf(format,##args)
+#else
+#define dbg_print(format,args...) do{} while(0)
+#endif
+
 #define KEEP_ALIVE 60
 #define MSG_MAX_SIZE 512
+
+void my_connect_callback(struct mosquitto *mosq,void *obj,int rc);
+void my_disconnect_callback(struct mosquitto *mosq,void *obj,int rc);
+void my_publish_callback(struct mosquitto *mosq,void *obj,int mid);
+int get_temperature(char *tempbuf);
+void *pub(void *arg);
+extern void get_config();
+extern void *delete_log_file(void *arg);
+
 #endif
 

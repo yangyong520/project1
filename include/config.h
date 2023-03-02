@@ -6,8 +6,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include "ini.h"
+#include "logger.h"
 
-//#include "logger.h"
 #define MAX_IP_LEN 16
 #define MAX_PATH_LEN 256
 

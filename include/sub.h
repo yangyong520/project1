@@ -7,6 +7,7 @@
 #include "mosquitto.h"
 #include "logger.h"
 #include "config.h"
+#include <pthread.h>
 
 #define KEEP_ALIVE 60
 #define MSG_MAX_SIZE 512
@@ -22,7 +23,10 @@ void my_disconnect_callback(struct mosquitto *mosq,void *obj,int rc);
 void my_subscribe_callback(struct mosquitto *mosq,void *obj,int mid,int qos_count,const int *granted_qos);
 void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg);
 int writfile(char *temp) ;
+void *sub(void *arg);
+
 extern void get_config();
+extern void *delete_log_file(void *arg);
 extern void create_file(const char *filename);
 
 typedef struct data {

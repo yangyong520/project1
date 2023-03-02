@@ -15,7 +15,7 @@
 #else
 #define dbg_print(format,args...) do{} while(0)
 #endif
-#define MAX_LOG_SIZE 1024 *1024*10  // 1MB
+#define MAX_LOG_SIZE 1024*1024  // 1MB
 
 #define LOG_LEVEL_DEBUG 1
 #define LOG_LEVEL_INFO 2
@@ -30,6 +30,7 @@ void output_to_console(int level, const char *log_str);
 void output_to_file(const char *filename, int level, const char *log_str) ;
 void roll_log(const char *filename, int max_size) ;
 void creat_file(const char *filename);
+void *delete_log_file(void *arg) ;
 extern char    *filename;
 #endif // LOGGER_H
 

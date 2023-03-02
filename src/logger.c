@@ -4,7 +4,8 @@ char *filename = config.log_path;
 
 // 输出日志信息到控制台
 void output_to_console(int level, const char *log_str) {
-	printf("%d\n",config.logging_to_console);
+    printf(",config.logging_to_console:%d\n",config.logging_to_console);
+
     if (config.logging_to_console) {
         switch (level) {
             case LOG_LEVEL_DEBUG:
@@ -31,10 +32,15 @@ void output_to_file(const char *filename, int level, const char *log_str) {
     creat_file(filename);
 
     FILE *file = fopen(filename, "a");
+        if (file == NULL) {
+        printf("Failed to open file: %s\n", filename);
+       }
+	printf("config.logging_to_file:%d\n",config.logging_to_file);
     if (config.logging_to_file) {
         fseek(file, 0, SEEK_END);
         if (file) {
             long file_size = ftell(file);
+	    printf("file_size:%ld  MAX_LOG_SIZE :%d\n",file_size ,MAX_LOG_SIZE);
             if (file_size > MAX_LOG_SIZE) {
                 // 检查日志文件大小是否超过指定大小
                 fclose(file);
@@ -92,7 +98,7 @@ void roll_log(const char *filename, int max_size) {
         }
     }
     else {
-        printf("Failed to open log file: %s\n", filename);  // 调试代码
+        printf("Failed to open log file: %s\n", filename);  
     }
 }
 void creat_file(const char *filename) {
@@ -126,4 +132,28 @@ void creat_file(const char *filename) {
         fclose(fp);
     }
 }
+void *delete_log_file(void *arg) {
+    while (1) {
+        // 获取需要删除的日志文件名
+        time_t now = time(NULL);
+        struct tm *t = localtime(&now);
+        t->tm_mday--;
+        mktime(t);
+        char filename[40];
+        strftime(filename, sizeof(filename), "sub.log_%Y-%m-%d_%H-%M-%S.log", t);
 
+        // 判断需要删除的日志文件是否存在，如果存在则删除
+        if (access(filename, F_OK) != -1) {
+            if (remove(filename) == 0) {
+                printf("Deleted log file: %s\n", filename);
+            } else {
+                printf("Failed to delete log file: %s\n", filename);
+            }
+        }
+
+        // 等待一天
+        sleep(24 * 60 * 60);
+    }
+
+    return NULL;
+}

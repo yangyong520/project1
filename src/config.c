@@ -1,7 +1,7 @@
 #include "config.h"
 
 config_t config;
-
+char buff[256];
 
 static int handler(void* user, const char* section, const char* name, const char* value) {
     config_t* pconfig = (config_t*)user;
@@ -39,10 +39,9 @@ int read_config(const char *filename, config_t *config) {
 void get_config() {
     if(read_config("../config.ini", &config) < 0)
     {
-	    printf("cannot open config file config.ini");
-  //      sprintf(error,"cannot open config file config.ini");
-    //    output_to_console(LOG_LEVEL_ERROR, error);
-      //  output_to_file(filename, LOG_LEVEL_ERROR, error);
+       sprintf(buff,"cannot open config file config.ini");
+       output_to_console(LOG_LEVEL_ERROR, buff);
+       output_to_file(filename, LOG_LEVEL_ERROR, buff);
 
     }
 
