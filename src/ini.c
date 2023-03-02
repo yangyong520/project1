@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
 #include "ini.h"
-#include "config.h"
-
-extern int config_handler(void* user, const char* section, const char* name, const char* value);
 
 
 // 解析INI配置文件

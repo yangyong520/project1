@@ -1,5 +1,13 @@
 #include"pub.h"
 
+static int running = 1;
+
+char    error[128];
+char    info[128];
+char    warn[128];
+char    debug[128];
+
+
 void my_connect_callback(struct mosquitto *mosq,void *obj,int rc)
 {
     output_to_console(LOG_LEVEL_INFO, "Call the function: my_connect_callback.");

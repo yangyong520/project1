@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include "ini.h"
 #include "config.h"
+
+config_t config;
+
 
 static int handler(void* user, const char* section, const char* name, const char* value) {
     config_t* pconfig = (config_t*)user;
@@ -21,6 +19,8 @@ static int handler(void* user, const char* section, const char* name, const char
         pconfig->logging_to_file = atoi(value);
     } else if (MATCH("Logging", "output_file")) {
         strncpy(pconfig->log_path, value, MAX_PATH_LEN);
+    } else if(MATCH("Logging", "log_level")) {
+	pconfig->log_level = atoi(value);
     } else if (MATCH("Data", "save_path")) {
         strncpy(pconfig->data_path, value, MAX_PATH_LEN);
     } else {
@@ -34,5 +34,17 @@ int read_config(const char *filename, config_t *config) {
         return -1;
     }
     return 0;
+}
+
+void get_config() {
+    if(read_config("../config.ini", &config) < 0)
+    {
+	    printf("cannot open config file config.ini");
+  //      sprintf(error,"cannot open config file config.ini");
+    //    output_to_console(LOG_LEVEL_ERROR, error);
+      //  output_to_file(filename, LOG_LEVEL_ERROR, error);
+
+    }
+
 }
 

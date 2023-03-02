@@ -11,13 +11,8 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include "logger.h"
-char    error[128];
-char    info[128];
-char    warn[128];
-char    debug[128];
+#include "config.h"
 
-const char *filename = "pub.log";
-static int running = 1;
 
 #define HOST "23.224.131.118"
 #define PORT 1883

@@ -1,12 +1,20 @@
-#include "config.h"
 #include "sub.h"
+
+static int running = 1;
+
+char    *dataname= "data.txt";
+char    error[128];
+char    info[128];
+char    warn[128];
+char    debug[128];
+
 int main (int argc, char **argv)
 {
     int ret;
     struct mosquitto *mosq;
 
-   global_config_ptr = get_config();
-
+    get_config();
+    strcat(config.log_path,"sub.log");
 
     ret = mosquitto_lib_init();
 
@@ -26,7 +34,7 @@ int main (int argc, char **argv)
     mosquitto_subscribe_callback_set(mosq,my_subscribe_callback);
     mosquitto_message_callback_set(mosq,my_message_callback);
 
-    ret = mosquitto_connect(mosq,global_config_ptr->ip,global_config_ptr->port,KEEP_ALIVE);
+    ret = mosquitto_connect(mosq,config.ip,config.port,KEEP_ALIVE);
 
     if(ret)
     {
@@ -138,8 +146,11 @@ int writfile(char *temp) {
     i = (i + 1) % 12;
     if (i==0)
     {
-	 strcpy(datapath,global_config_ptr->data_path);
+	 strcpy(datapath,config.data_path);
 	 strcat(datapath,dataname);
+	 
+	 creat_file(datapath);
+	 printf("datapath:%s\n",datapath);
         fp=fopen(datapath,"a");
         fprintf(fp,"%s %s %s %s %s %s %s %s %s %s %s %s\n", dt.time[0], dt.time[1], dt.time[2], dt.time[3], dt.time[4], dt.time[5], dt.time[6], dt.time[7], dt.time[8], dt.time[9], dt.time[10], dt.time[11]);
     fclose(fp);
@@ -148,15 +159,3 @@ int writfile(char *temp) {
     return 0;
 }
 
-config_t *get_config() {
-    static config_t static_config;
-    if(read_config("../config.ini", &static_config) < 0)
-    {
-        sprintf(error,"cannot open config file config.ini");
-        output_to_console(LOG_LEVEL_ERROR, error);
-        output_to_file(filename, LOG_LEVEL_ERROR, error);
-
-    }
-    return &static_config;
-
-}
